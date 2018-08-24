@@ -589,6 +589,13 @@ function TournamentAgent(config){
 		self.coins += payoff;
 		self.updateScore();
 	};
+        
+	// Trust Score
+	self.trustScore = 0;
+	self.updateTrustScore = function(points){
+		self.trustScore += points;
+		self.updateScore();
+	}
 
 	// What's the image?
 	var g = new PIXI.Container();
@@ -613,7 +620,7 @@ function TournamentAgent(config){
 	g.addChild(scoreText);
 	self.updateScore = function(){
 		scoreText.visible = true;
-		scoreText.text = self.coins;
+		scoreText.text = self.coins+"/"+self.trustScore;
 	};
 	self.updateScore();
 	scoreText.visible = false;

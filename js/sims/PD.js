@@ -97,11 +97,26 @@ PD.playRepeatedGame = function(playerA, playerB, turns){
 		scores.totalA += p[0];
 		scores.totalB += p[1];
 	}
+	
+	PD.updateTrustScores(playerA, playerB, scores);
 
 	// Return the scores...
 	return scores;
 
 };
+
+PD.updateTrustScores = function(playerA, playerB, scores){
+	if(scores.totalB>15){
+		playerA.updateTrustScore(1);
+	}else{
+		playerA.updateTrustScore(-1);
+	}
+	if(scores.totalA>15){
+		playerB.updateTrustScore(1);
+	}else{
+		playerB.updateTrustScore(-1);
+	}
+}
 
 PD.playOneTournament = function(agents, turns){
 
@@ -110,16 +125,26 @@ PD.playOneTournament = function(agents, turns){
 		agents[i].resetCoins();
 	}
 
-	// Round robin!
+	// Round robin! not
 	for(var i=0; i<agents.length; i++){
 		var playerA = agents[i];
-		for(var j=i+1; j<agents.length; j++){
-			var playerB = agents[j];
-			PD.playRepeatedGame(playerA, playerB, turns);
-		}	
+		var j = PD.selectOponent(agents)
+		var playerB = agents[j];
+		PD.playRepeatedGame(playerA, playerB, turns);
+		
 	}
 
 };
+
+PD.selectOponent = function(agents){
+	var max = 0;
+	for(var i=1; i<agents.length; i++){
+		if(agents[i].trustScore>agents[max].trustScore){
+			max=i;
+		}
+	}
+	return max;
+}
 
 ///////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////
