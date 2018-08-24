@@ -348,11 +348,28 @@ function SandboxUI(config){
 	});
 	page.appendChild(rule_turns);
 	page.appendChild(slider_turns.dom);
+        
+        // Rule: Area (1 to 25)
+	var rule_area = _makeLabel("sandbox_rules_4", {x:0, y:80, w:433});
+	var slider_area = new Slider({
+		x:0, y:105, width:430,
+		min:1, max:24, step:1,
+		message: "rules/area"
+	});
+	sliders.push(slider_area);
+	slider_area.slideshow = self.slideshow;
+	listen(self, "rules/area",function(value){
+		var words = (value==1) ? Words.get("sandbox_rules_4_single") : Words.get("sandbox_rules_4"); // plural?
+		words = words.replace(/\[N\]/g, value+""); // replace [N] with the number value
+		rule_area.innerHTML = words;
+	});
+	page.appendChild(rule_area);
+	page.appendChild(slider_area.dom);
 
 	// Rule: Eliminate/Reproduce how many? (1 to 12)
-	var rule_evolution = _makeLabel("sandbox_rules_2", {x:0, y:100, w:433});
+	var rule_evolution = _makeLabel("sandbox_rules_2", {x:0, y:150, w:433});
 	var slider_evolution = new Slider({
-		x:0, y:165, width:430,
+		x:0, y:205, width:430,
 		min:1, max:10, step:1,
 		message: "rules/evolution"
 	});
@@ -367,9 +384,9 @@ function SandboxUI(config){
 	page.appendChild(slider_evolution.dom);
 
 	// Rule: Noise (0% to 50%)
-	var rule_noise = _makeLabel("sandbox_rules_3", {x:0, y:225, w:433});
+	var rule_noise = _makeLabel("sandbox_rules_3", {x:0, y:300, w:433});
 	var slider_noise = new Slider({
-		x:0, y:290, width:430,
+		x:0, y:350, width:430,
 		min:0.00, max:0.50, step:0.01,
 		message: "rules/noise"
 	});
@@ -386,6 +403,7 @@ function SandboxUI(config){
 
 	// DEFAULTS
 	publish("rules/turns", [10]);
+        publish("rules/area", [5]);
 	publish("rules/evolution", [5]);
 	publish("rules/noise", [0.05]);
 

@@ -45,6 +45,11 @@ subscribe("rules/noise",function(value){
 	PD.NOISE = value;
 });
 
+PD.AREA = 1;
+subscribe("rules/area",function(value){
+	PD.AREA = value;
+});
+
 PD.getPayoffs = function(move1, move2){
 	var payoffs = PD.PAYOFFS;
 	if(move1==PD.CHEAT && move2==PD.CHEAT) return [payoffs.P, payoffs.P]; // both punished
@@ -128,7 +133,7 @@ PD.playOneTournament = function(agents, turns){
 	// Round robin! not
 	for(var i=0; i<agents.length; i++){
 		var playerA = agents[i];
-		var j = PD.selectOponent(agents)
+		var j = PD.selectOponent(agents,i)
 		var playerB = agents[j];
 		PD.playRepeatedGame(playerA, playerB, turns);
 		
@@ -136,11 +141,11 @@ PD.playOneTournament = function(agents, turns){
 
 };
 
-PD.selectOponent = function(agents){
-	var max = 0;
-	for(var i=1; i<agents.length; i++){
-		if(agents[i].trustScore>agents[max].trustScore){
-			max=i;
+PD.selectOponent = function(agents, number){
+	var max = (number+1)%agents.length;
+	for(var i=2; i<PD.AREA+1; i++){
+		if(agents[(number+i)%agents.length].trustScore>agents[max].trustScore){
+			max=(number+i)%agents.length;
 		}
 	}
 	return max;
