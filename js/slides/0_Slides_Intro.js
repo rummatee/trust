@@ -120,7 +120,7 @@ SLIDES.push({
 		self.add({
 			id:"intro_button", type:"Button", x:304, y:466, size:"long",
 			text_id:"intro_button", 
-			message:"slideshow/scratch"
+			message:"slideshow/next"
 		});
 
 		_hide(o.intro_text); _fadeIn(o.intro_text, 200);
