@@ -2,6 +2,8 @@ Tournament.resetGlobalVariables = function(){
 
 	Tournament.SELECTION = 5;
 	Tournament.NUM_TURNS = 10;
+        
+        Tournament.AREA = 5;
 
 	Tournament.INITIAL_AGENTS = [
 		{strategy:"tft", count:3},
@@ -17,6 +19,7 @@ Tournament.resetGlobalVariables = function(){
 	Tournament.FLOWER_CONNECTIONS = false;
 
 	publish("pd/defaultPayoffs");
+        publish("Tournament/defaultTrustPayoffs");
 
 	PD.NOISE = 0;
 
@@ -31,6 +34,9 @@ subscribe("rules/evolution",function(value){
 subscribe("rules/turns",function(value){
 	Tournament.NUM_TURNS = value;
 });
+
+
+
 
 // OH THAT'S SO COOL. Mostly C: Pavlov wins, Mostly D: tit for two tats wins (with 5% mistake!)
 // ALSO, NOISE: tft vs all_d. no random: tft wins. low random: tf2t wins. high random: all_d wins. totally random: nobody wins
@@ -94,6 +100,8 @@ function Tournament(config){
 		
 		// Convert to an array
 		self.agents = _convertCountToArray(AGENTS);
+		
+		
 
 		// Put 'em in a ring
 		var count = 0;
@@ -131,8 +139,8 @@ function Tournament(config){
 		for(var i=0; i<self.agents.length; i++){
 			var playerA = self.agents[i];
 			var flip = false;
-			for(var j=i+1; j<self.agents.length; j++){
-				var playerB = self.agents[j];
+			for(var j=i+1; j-i<=Tournament.AREA; j++){
+				var playerB = self.agents[j%self.agents.length];
 				var connection = new TournamentConnection({
 					tournament: self,
 					from: playerA,
@@ -150,6 +158,11 @@ function Tournament(config){
 		var index = self.connections.indexOf(connection);
 		self.connections.splice(index,1);
 	};
+        
+        subscribe("rules/area",function(value){
+            Tournament.AREA = value;
+            self.createNetwork();
+        });
 
 
 	///////////////////////
@@ -231,6 +244,7 @@ function Tournament(config){
 		PD.playOneTournament(self.agents, Tournament.NUM_TURNS);
 		self.agentsSorted = _shuffleArray(self.agents.slice());
 		self.agentsSorted.sort(function(a,b){ return a.coins-b.coins; });
+                self.agents = _shuffleArray(self.agents.slice());
 	};
 
 	// Get rid of X worst
@@ -462,6 +476,8 @@ function TournamentConnection(config){
 	self.to = config.to;
 	self.from.connections.push(self);
 	self.to.connections.push(self);
+        self.from.opponents.push(self.to);
+        self.to.opponents.push(self.from);
 
 	// Graphics!
 	var g;
@@ -550,6 +566,8 @@ function TournamentConnection(config){
 	self.kill = function(){
 		if(self.IS_DEAD) return;
 		self.IS_DEAD = true;
+                self.from.removeOpponent(self.to);
+                self.to.removeOpponent(self.from);
 		self.graphics.parent.removeChild(self.graphics); // remove self's graphics
 		self.tournament.actuallyRemoveConnection(self);
 	};
@@ -570,6 +588,7 @@ function TournamentAgent(config){
 
 	// Connections
 	self.connections = [];
+        self.opponents = [];
 	self.highlightConnections = function(){
 		for(var i=0;i<self.connections.length;i++) self.connections[i].highlight();
 	};
@@ -582,6 +601,13 @@ function TournamentAgent(config){
 		}
 		self.connections = [];
 	};
+        
+        self.removeOpponent = function(opponent){
+                var index = self.opponents.indexOf(opponent);
+                if (index > -1) {
+                    self.opponents.splice(index);
+                }
+        }
 
 	// Number of coins
 	self.coins = 0;

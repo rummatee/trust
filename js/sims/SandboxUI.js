@@ -70,6 +70,8 @@ function SandboxUI(config){
 	_makeHitbox(Words.get("label_population"), 30, 100, 0);
 	_makeHitbox(Words.get("label_payoffs"), 220, 100, 1);
 	_makeHitbox(Words.get("label_rules"), 366, 100, 2);
+        _makeHitbox(Words.get("label_network"), 470, 100, 3);
+        _makeHitbox(Words.get("label_trustscore"), 620, 100, 4);
 
 	// Pages
 	var pages = [];
@@ -79,7 +81,7 @@ function SandboxUI(config){
 		tabs.appendChild(page);
 		pages.push(page);
 	};
-	for(var i=0; i<3; i++) _makePage(); // make three pages
+	for(var i=0; i<5; i++) _makePage(); // make five pages
 
 	// Go To Page
 	var _goToPage = function(showIndex){
@@ -349,22 +351,6 @@ function SandboxUI(config){
 	page.appendChild(rule_turns);
 	page.appendChild(slider_turns.dom);
         
-        // Rule: Area (1 to 25)
-	var rule_area = _makeLabel("sandbox_rules_4", {x:0, y:80, w:433});
-	var slider_area = new Slider({
-		x:0, y:105, width:430,
-		min:1, max:24, step:1,
-		message: "rules/area"
-	});
-	sliders.push(slider_area);
-	slider_area.slideshow = self.slideshow;
-	listen(self, "rules/area",function(value){
-		var words = (value==1) ? Words.get("sandbox_rules_4_single") : Words.get("sandbox_rules_4"); // plural?
-		words = words.replace(/\[N\]/g, value+""); // replace [N] with the number value
-		rule_area.innerHTML = words;
-	});
-	page.appendChild(rule_area);
-	page.appendChild(slider_area.dom);
 
 	// Rule: Eliminate/Reproduce how many? (1 to 12)
 	var rule_evolution = _makeLabel("sandbox_rules_2", {x:0, y:150, w:433});
@@ -403,9 +389,56 @@ function SandboxUI(config){
 
 	// DEFAULTS
 	publish("rules/turns", [10]);
-        publish("rules/area", [5]);
+        
 	publish("rules/evolution", [5]);
 	publish("rules/noise", [0.05]);
+        
+        /////////////////////////////////////////
+	// PAGE 3: NETWORK //////////////////////
+	/////////////////////////////////////////
+
+	var page = pages[3];
+        
+        // Rule: Area (1 to 25)
+	var rule_area = _makeLabel("sandbox_rules_4", {x:0, y:80, w:433});
+	var slider_area = new Slider({
+		x:0, y:105, width:430,
+		min:1, max:12, step:1,
+		message: "rules/area"
+	});
+	sliders.push(slider_area);
+	slider_area.slideshow = self.slideshow;
+	listen(self, "rules/area",function(value){
+		var words = (value==1) ? Words.get("sandbox_rules_4_single") : Words.get("sandbox_rules_4"); // plural?
+		words = words.replace(/\[N\]/g, value+""); // replace [N] with the number value
+		rule_area.innerHTML = words;
+	});
+	page.appendChild(rule_area);
+	page.appendChild(slider_area.dom);
+        
+        publish("rules/area", [5]);
+        
+        /////////////////////////////////////////
+	// PAGE 4: TRUSTSCORE ///////////////////
+	/////////////////////////////////////////
+
+	var page = pages[4];
+        
+        // Labels
+	page.appendChild(_makeLabel("sandbox_payoffs", {x:0, y:0, w:433}));
+        
+        
+	
+	// PAYOFFS
+	var trustscoreUI = new TrustscoreUI({x:84, y:41, scale:0.9, slideshow:self});
+	page.appendChild(trustscoreUI.dom);
+
+	// Reset
+	var resetTrustscorePayoffs = new Button({
+		x:240, y:300, text_id:"sandbox_reset_payoffs",
+		message:"Tournament/defaultTrustPayoffs"
+	});
+	page.appendChild(resetTrustscorePayoffs.dom);
 
 	/////////////////////////////////////////
 	// Add & Remove Object //////////////////

@@ -40,6 +40,25 @@ subscribe("pd/defaultPayoffs", function(){
 
 });
 
+TRUSTPAYOFFS_DEFAULT = {
+	R: 1, // punishment: neither of you get anything
+	D: -1 // sucker: you put in coin, other didn't.
+};
+
+PD.TRUSTPAYOFFS = JSON.parse(JSON.stringify(TRUSTPAYOFFS_DEFAULT));
+
+subscribe("PD/editTrustPayoffs/R", function(value){ PD.TRUSTPAYOFFS.R = value; });
+subscribe("PD/editTrustPayoffs/D", function(value){ PD.TRUSTPAYOFFS.D = value; });
+subscribe("PD/defaultTrustPayoffs", function(){
+
+	PD.TRUSTPAYOFFS = JSON.parse(JSON.stringify(TRUSTPAYOFFS_DEFAULT));
+
+	publish("PD/editTrustPayoffs/R", [PD.TRUSTPAYOFFS.R]);
+	publish("PD/editTrustPayoffs/D", [PD.TRUSTPAYOFFS.D]);
+
+});
+
+
 PD.NOISE = 0;
 subscribe("rules/noise",function(value){
 	PD.NOISE = value;
@@ -48,6 +67,11 @@ subscribe("rules/noise",function(value){
 PD.AREA = 1;
 subscribe("rules/area",function(value){
 	PD.AREA = value;
+});
+
+PD.LIMIT = PD.PAYOFFS.R*1/1.8;
+subscribe("rules/limit",function(value){
+	PD.LIMIT = value;
 });
 
 PD.getPayoffs = function(move1, move2){
@@ -103,25 +127,27 @@ PD.playRepeatedGame = function(playerA, playerB, turns){
 		scores.totalB += p[1];
 	}
 	
-	PD.updateTrustScores(playerA, playerB, scores);
+	PD.updateTrustScores(playerA, playerB, scores, turns);
 
 	// Return the scores...
 	return scores;
 
 };
 
-PD.updateTrustScores = function(playerA, playerB, scores){
-	if(scores.totalB>15){
-		playerA.updateTrustScore(1);
+PD.updateTrustScores = function(playerA, playerB, scores, turns){
+    var payoffs = PD.PAYOFFS;
+    
+	if(scores.totalB>PD.LIMIT){
+		playerA.updateTrustScore(PD.TRUSTPAYOFFS.R);
 	}else{
-		playerA.updateTrustScore(-1);
+		playerA.updateTrustScore(PD.TRUSTPAYOFFS.D);
 	}
-	if(scores.totalA>15){
-		playerB.updateTrustScore(1);
+	if(scores.totalA>PD.LIMIT){
+		playerB.updateTrustScore(PD.TRUSTPAYOFFS.R);
 	}else{
-		playerB.updateTrustScore(-1);
+		playerB.updateTrustScore(PD.TRUSTPAYOFFS.D);
 	}
-}
+};
 
 PD.playOneTournament = function(agents, turns){
 
@@ -133,8 +159,7 @@ PD.playOneTournament = function(agents, turns){
 	// Round robin! not
 	for(var i=0; i<agents.length; i++){
 		var playerA = agents[i];
-		var j = PD.selectOponent(agents,i)
-		var playerB = agents[j];
+		var playerB = PD.selectOponent(agents,i);
 		PD.playRepeatedGame(playerA, playerB, turns);
 		
 	}
@@ -142,13 +167,15 @@ PD.playOneTournament = function(agents, turns){
 };
 
 PD.selectOponent = function(agents, number){
-	var max = (number+1)%agents.length;
-	for(var i=2; i<PD.AREA+1; i++){
-		if(agents[(number+i)%agents.length].trustScore>agents[max].trustScore){
-			max=(number+i)%agents.length;
+	var max = 0;
+        var agent = agents[number];
+        var opponents = agent.opponents;
+	for(var i=0; i<opponents.length-1; i++){
+		if(opponents[i].trustScore>opponents[max].trustScore){
+			max=i;
 		}
 	}
-	return max;
+	return opponents[max];
 }
 
 ///////////////////////////////////////////////////////
