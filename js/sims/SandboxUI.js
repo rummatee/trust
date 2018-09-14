@@ -347,6 +347,7 @@ function SandboxUI(config){
 		var words = (value==1) ? Words.get("sandbox_rules_1_single") : Words.get("sandbox_rules_1"); // plural?
 		words = words.replace(/\[N\]/g, value+""); // replace [N] with the number value
 		rule_turns.innerHTML = words;
+        publish("rules/resetLimit");
 	});
 	page.appendChild(rule_turns);
 	page.appendChild(slider_turns.dom);

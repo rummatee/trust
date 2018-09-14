@@ -71,9 +71,10 @@ function TrustscoreUI(config){
         rule_limit.innerHTML = words;
     });
     listen(self, "rules/resetLimit", function() {
-        slider_limit.min=PD.PAYOFFS.S*Tournament.NUM_TURNS;
-        slider_limit.max=PD.PAYOFFS.R*Tournament.NUM_TURNS;
-        slider_limit.value=PD.PAYOFFS.R*Tournament.NUM_TURNS/1.8; 
+        slider_limit.setBounds({min:PD.PAYOFFS.S*Tournament.NUM_TURNS, max:PD.PAYOFFS.T*Tournament.NUM_TURNS});
+        slider_limit.setParam({});
+        slider_limit.setValue(PD.PAYOFFS.R*round(Tournament.NUM_TURNS/1.8)); 
+        publish("rules/limit");
     });
     dom.appendChild(rule_limit);
     dom.appendChild(slider_limit.dom);

@@ -25,10 +25,22 @@ PD.PAYOFFS = JSON.parse(JSON.stringify(PD.PAYOFFS_DEFAULT));
 subscribe("pd/editPayoffs", function(payoffs){
 	PD.PAYOFFS = payoffs;
 });
-subscribe("pd/editPayoffs/P", function(value){ PD.PAYOFFS.P = value; });
-subscribe("pd/editPayoffs/S", function(value){ PD.PAYOFFS.S = value; });
-subscribe("pd/editPayoffs/R", function(value){ PD.PAYOFFS.R = value; });
-subscribe("pd/editPayoffs/T", function(value){ PD.PAYOFFS.T = value; });
+subscribe("pd/editPayoffs/P", function(value){ 
+    PD.PAYOFFS.P = value;
+    publish("rules/resetLimit");
+});
+subscribe("pd/editPayoffs/S", function(value){ 
+    PD.PAYOFFS.S = value;
+    publish("rules/resetLimit");
+});
+subscribe("pd/editPayoffs/R", function(value){
+    PD.PAYOFFS.R = value;
+    publish("rules/resetLimit");
+});
+subscribe("pd/editPayoffs/T", function(value){
+    PD.PAYOFFS.T = value;
+    publish("rules/resetLimit");
+});
 subscribe("pd/defaultPayoffs", function(){
 
 	PD.PAYOFFS = JSON.parse(JSON.stringify(PD.PAYOFFS_DEFAULT));

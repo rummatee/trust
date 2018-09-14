@@ -28,6 +28,11 @@ function Slider(config){
 	knob.className = "slider_knob";
 	dom.appendChild(knob);
 
+    //SetBounds
+    self.setBounds = function(bounds){
+        config.min = bounds.min;
+        config.max = bounds.max;
+    }
 	// Set value
 	self.value = 0;
 	var _paramToValue = function(param){
