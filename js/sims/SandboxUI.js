@@ -419,9 +419,15 @@ function SandboxUI(config){
         message: "rules/shuffle",
         x:0, y:200
     });
+    var shuffleStart_button = new ToggleButton({
+        text_id: "sandbox_shuffleStart_btn",
+        message: "rules/shuffle_start",
+        x:250, y:200
+    });
     page.appendChild(rule_area);
     page.appendChild(slider_area.dom);
     page.appendChild(shuffle_button.dom);
+    page.appendChild(shuffleStart_button.dom);
         
     publish("rules/area", [5]);
         

@@ -93,6 +93,11 @@ function Tournament(config){
 	app.stage.addChild(self.networkContainer);
 	app.stage.addChild(self.agentsContainer);
 
+    self.shuffle_start = false;
+    subscribe("rules/shuffle_start",function(){
+        self.shuffle_start = !self.shuffle_start;
+    });
+
 	self.populateAgents = function(){
 
 		// Clear EVERYTHING
@@ -101,6 +106,9 @@ function Tournament(config){
 		// Convert to an array
 		self.agents = _convertCountToArray(AGENTS);
 		
+        if (self.shuffle_start) {
+            self.agents = _shuffleArray(self.agents.slice());
+        }
 		
 
 		// Put 'em in a ring
