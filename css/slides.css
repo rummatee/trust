@@ -233,6 +233,9 @@ s{
 .button[deactivated=yes] #text{
 	color: #CCCCCC;
 }
+.button[active=yes] #text{
+    color: #FF3333;
+}
 .button[deactivated=yes] #hitbox{
 	display: none;
 }

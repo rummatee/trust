@@ -159,10 +159,10 @@ function Tournament(config){
 		self.connections.splice(index,1);
 	};
         
-        subscribe("rules/area",function(value){
-            Tournament.AREA = value;
-            self.createNetwork();
-        });
+    subscribe("rules/area",function(value){
+        Tournament.AREA = value;
+        self.createNetwork();
+    });
 
 
 	///////////////////////
@@ -234,6 +234,10 @@ function Tournament(config){
 		for(var i=0; i<self.connections.length; i++) self.connections[i].dehighlight();
 	};
 
+    self.shuffle = false;
+    subscribe("rules/shuffle",function(){
+        self.shuffle = !self.shuffle;
+    });
 	////////////////////////////////////
 	// EVOLUTION ///////////////////////
 	////////////////////////////////////
@@ -244,7 +248,9 @@ function Tournament(config){
 		PD.playOneTournament(self.agents, Tournament.NUM_TURNS);
 		self.agentsSorted = _shuffleArray(self.agents.slice());
 		self.agentsSorted.sort(function(a,b){ return a.coins-b.coins; });
-                self.agents = _shuffleArray(self.agents.slice());
+        if (self.shuffle) {
+            self.agents = _shuffleArray(self.agents.slice());
+        }
 	};
 
 	// Get rid of X worst
