@@ -86,6 +86,12 @@ subscribe("rules/limit",function(value){
 	PD.LIMIT = value;
 });
 
+PD.REFUSE = 0;
+subscribe("rules/refuse",function(value){
+	PD.REFUSE = value;
+});
+
+
 PD.getPayoffs = function(move1, move2){
 	var payoffs = PD.PAYOFFS;
 	if(move1==PD.CHEAT && move2==PD.CHEAT) return [payoffs.P, payoffs.P]; // both punished
@@ -172,7 +178,9 @@ PD.playOneTournament = function(agents, turns){
 	for(var i=0; i<agents.length; i++){
 		var playerA = agents[i];
 		var playerB = PD.selectOponent(agents,i);
-		PD.playRepeatedGame(playerA, playerB, turns);
+        if (playerB){
+		    PD.playRepeatedGame(playerA, playerB, turns);
+        }
 		
 	}
 
@@ -184,12 +192,22 @@ PD.selectOponent = function(agents, number){
         var opponents = agent.opponents;
 	for(var i=0; i<opponents.length-1; i++){
 		if(opponents[i].trustScore>opponents[max].trustScore){
-			max=i;
+            if(PD.acceptOpponent(opponents[i],agent)){
+			    max=i;
+            }else {
+                return null;
+            }
 		}
 	}
 	return opponents[max];
 }
 
+PD.acceptOpponent = function(A, B){
+    if (B.trustScore<PD.REFUSE){
+        return false;
+    }
+    return true;
+}
 ///////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////

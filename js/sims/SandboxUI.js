@@ -453,6 +453,22 @@ function SandboxUI(config){
     });
     page.appendChild(resetTrustscorePayoffs.dom);
 
+    var rule_refuse = _makeLabel("sandbox_rules_4", {x:0, y:280, w:433});
+    var slider_refuse = new Slider({
+        x:0, y:305, width:430,
+        min:-6, max:12, step:1,
+        message: "rules/refuse"
+    });
+    sliders.push(slider_refuse);
+    slider_refuse.slideshow = self.slideshow;
+    listen(self, "rules/refuse",function(value){
+        var words = (value==1) ? Words.get("sandbox_rules_4_single") : Words.get("sandbox_rules_4"); // plural?
+        words = words.replace(/\[N\]/g, value+""); // replace [N] with the number value
+        rule_refuse.innerHTML = words;
+    });
+    page.appendChild(rule_refuse);
+    page.appendChild(slider_refuse.dom);
+
     /////////////////////////////////////////
     // Add & Remove Object //////////////////
     /////////////////////////////////////////
